@@ -1,0 +1,9 @@
+
+export class State {
+  id: number;
+  name: string;
+  abbreviation: string;
+  countryId: string;
+  countryName: string;
+}
+

@@ -11,6 +11,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {environment} from '../environments/environment';
 import {HttpClientModule} from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {Gateway23blocksModule} from './core/23blocks/gateway/gateway-23blocks.module';
 
 @NgModule({
   imports: [
@@ -18,6 +19,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     FormsModule,
     AppRoutingModule,
     AppComponent,
+    Gateway23blocksModule.forRoot({
+      apiBase: environment.API_23GATEWAY_URL,
+      APPID: environment.APPID,
+      registerAccountCallback: environment.APP_URL + '/auth/step2/',
+      resetPasswordCallback: environment.APP_URL + '/auth/change-password/'}),
+
   ],
   declarations: [
     AppComponent,
@@ -31,6 +38,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     ReactiveFormsModule,
     BrowserAnimationsModule
   ],
-  bootstrap: [ AppComponent ]
+  providers: [
+    Gateway23blocksModule],
+  bootstrap: [AppComponent]
 })
 export class AppModule { }
