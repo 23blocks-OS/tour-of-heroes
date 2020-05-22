@@ -23,7 +23,7 @@ export const initialAuthState: AuthState = {
   avatar: undefined,
   authToken: undefined,
   isUserLoaded: false,
-isAvatarLoaded: false
+  isAvatarLoaded: false,
 };
 
 export function authReducer(state = initialAuthState, action: AuthActions): AuthState {
@@ -52,17 +52,17 @@ export function authReducer(state = initialAuthState, action: AuthActions): Auth
         user: undefined,
         isUserLoaded: false,
         avatar: undefined,
-        isAvatarLoaded: false
+        isAvatarLoaded: false,
       };
     }
 
     case AuthActionTypes.Logout: {
-      console.log('LogOut Reducer');
+      // console.log('LogOut Reducer');
       return initialAuthState;
     }
 
     case AuthActionTypes.UserLoaded: {
-      console.log('User Loaded action');
+      // console.log('User Loaded action');
       // console.log(action.payload.authUser.name);
       // console.log('email: ' + action.payload.authUser.email);
 

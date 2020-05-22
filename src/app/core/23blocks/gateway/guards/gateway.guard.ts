@@ -19,9 +19,9 @@ export class GatewayGuard implements CanActivate {
             .pipe(
                 select(isLoggedIn),
                 tap(loggedIn => {
-                  console.log('Guard Eval');
+                  // console.log('Guard Eval');
                   if (!loggedIn) {
-                    console.log('Not Logged');
+                    // console.log('Not Logged');
                     this.router.navigateByUrl('/auth/login');
                   }
                 })

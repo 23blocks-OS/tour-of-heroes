@@ -37,6 +37,11 @@ export const isAvatarLoaded = createSelector(
 	auth => auth.isAvatarLoaded
 );
 
+export const isCompanyLoaded = createSelector(
+  selectAuthState,
+  auth => auth.isCompanyLoaded
+);
+
 export const currentAuthUser = createSelector(
     selectAuthState,
     auth => auth.user
@@ -45,6 +50,11 @@ export const currentAuthUser = createSelector(
 export const currentAuthAvatar = createSelector(
 	selectAuthState,
 	auth => auth.avatar
+);
+
+export const currentAuthCompany = createSelector(
+  selectAuthState,
+  auth => auth.company
 );
 
 export const currentAuthUserId = createSelector(

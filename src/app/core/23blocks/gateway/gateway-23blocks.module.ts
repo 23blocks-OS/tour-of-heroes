@@ -9,15 +9,18 @@ import { UploadService } from './services/upload.service';
 import {StoreModule} from '@ngrx/store';
 
 import {EffectsModule} from '@ngrx/effects';
-
-
-
+import {authReducer} from './reducers/auth.reducers';
+import {AuthEffects} from './effects/auth.effects';
+import {CompanyEffects} from './effects/company.effects';
+import {companyReducer} from './reducers/company.reducers';
 
 @NgModule({
-  // imports: [
-  //   StoreModule.forFeature('gateway', CRMReducer),
-  //   EffectsModule.forFeature([CRMEffects])
-  // ]
+  imports: [
+    StoreModule.forFeature('auth', authReducer),
+    EffectsModule.forFeature([AuthEffects]),
+    StoreModule.forFeature('companies', companyReducer),
+    EffectsModule.forFeature([CompanyEffects])
+  ]
 })
 
 export class Gateway23blocksModule {

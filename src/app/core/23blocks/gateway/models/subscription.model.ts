@@ -15,6 +15,7 @@ export class Subscription {
 	paymentsMade: number;
 	status: string;
 	bankruptcy: boolean;
+	payload: string;
 
 	clear(): void {
 		this.id = undefined;
