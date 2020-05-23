@@ -132,12 +132,12 @@ export class GatewayService  {
    *
    */
 
-  // Register User Request
-  registerUser(registerData: NewRegistrationData): Observable<AuthApiResponse> {
+  // Register User
+  registerUser(registrationData: NewRegistrationData): Observable<AuthApiResponse> {
     // console.log(registerData);
     this.clearAuthData();
-    registerData.confirm_success_url = this.options.registerAccountCallback;
-    return this.http.post<AuthApiResponse>(this.getApiPath(), registerData);
+    registrationData.confirm_success_url = this.options.registerAccountCallback;
+    return this.http.post<AuthApiResponse>(this.getApiPath() + this.options.registerAccountPath,  registrationData);
   }
 
   // Delete Account
@@ -255,7 +255,7 @@ export class GatewayService  {
 
   // Avatar
   getAvatar(userId: string): Observable<AuthApiResponse> {
-    console.log('Avatar Service');
+    // console.log('Avatar Service');
     return this.http.get(environment.API_23GATEWAY_URL + '/users/' + userId + '/avatar');
   }
 
@@ -268,6 +268,17 @@ export class GatewayService  {
   getAllRoles(): Observable<AuthApiResponse> {
     // console.log('Roles Service Call');
     return this.http.get<AuthApiResponse>(this.getServerPath() + this.options.rolesPath);
+  }
+
+  // Account
+  getCompany(urlId:string): Observable<AuthApiResponse> {
+    // console.log('Get Company');
+    return this.http.get(environment.API_23GATEWAY_URL + '/companies/' + urlId);
+  }
+
+  getCompanies(userId: string): Observable<AuthApiResponse> {
+    // console.log('Get Accounts');
+    return this.http.get(environment.API_23GATEWAY_URL + '/users/' + userId + '/companies');
   }
 
   /**

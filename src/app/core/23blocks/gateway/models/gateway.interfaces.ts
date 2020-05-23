@@ -58,13 +58,16 @@ export interface SignInData {
   password: string;
 }
 
-export interface NewRegistrationData {
+export interface NewUserData {
   uid: string;
   provider: string;
   email: string;
   password: string;
   username: string;
   name: string;
+}
+export interface NewRegistrationData {
+  user: NewUserData;
   confirm_success_url: string;
   subscription: string;
 }

@@ -1,6 +1,7 @@
 import { Role } from './role.model';
 import { Subscription } from './subscription.model';
 import { Avatar } from './avatar.model';
+import {Profile} from './profile.model';
 
 
 export class User {
@@ -17,6 +18,7 @@ export class User {
 	uniqueId: string;
 	lastSignInAt: Date;
 	roles: Role[];
-	subscription: Subscription;
-	avatar: Avatar;
+	userSubscription: Subscription;
+	userAvatar: Avatar;
+	userProfile: Profile;
 }
