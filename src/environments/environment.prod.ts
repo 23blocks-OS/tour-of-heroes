@@ -6,8 +6,8 @@ export const environment = {
   authTokenKey: 'authce9d77b308c149d5992a80073637105',
 	API_URL: 'https://api.legge.co',
 	APP_URL: 'https://app.legge.co',
-  API_23GATEWAY_URL: 'https://gateway.23blocks.com',
+  API_23GATEWAY_URL: 'https://stage-gateway.23blocks.com',
   API_23CRM_URL: 'https://crm.23blocks.com',
 	WEBSOCKETS_23_URL: 'wss://stage-conversations.23blocks.com/cable',
-	APPID: 'jMFzU8aqMkxa8w'
+	APPID: 'UkBAIEV_7pBbsQ'
 };
