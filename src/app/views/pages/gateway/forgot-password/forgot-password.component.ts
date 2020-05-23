@@ -6,7 +6,6 @@ import { Router } from '@angular/router';
 import { finalize, takeUntil, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 // Translate
-import { TranslateService } from '@ngx-translate/core';
 // Auth
 import {AuthNoticeService, GatewayService} from '../../../../core/23blocks/gateway';
 
@@ -14,7 +13,8 @@ import {AuthNoticeService, GatewayService} from '../../../../core/23blocks/gatew
 @Component({
 	selector: 'app-gateway-forgot-password',
 	templateUrl: './forgot-password.component.html',
-	encapsulation: ViewEncapsulation.None
+	encapsulation: ViewEncapsulation.None,
+	styleUrls: ['./forgot-password.component.scss']
 })
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
 	// Public params
@@ -37,7 +37,6 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 	constructor(
 		private authService: GatewayService,
 		public authNoticeService: AuthNoticeService,
-		private translate: TranslateService,
 		private router: Router,
 		private fb: FormBuilder,
 		private cdr: ChangeDetectorRef
@@ -99,12 +98,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 		const email = controls.email.value;
 		this.authService.resetPassword({login: email}).pipe(
 			tap(response => {
-				if (response) {
-					this.authNoticeService.setNotice(this.translate.instant('AUTH.FORGOT.SUCCESS'), 'success');
-					this.router.navigateByUrl('/auth/login');
-				} else {
-					this.authNoticeService.setNotice(this.translate.instant('AUTH.VALIDATION.NOT_FOUND', {name: this.translate.instant('AUTH.INPUT.EMAIL')}), 'danger');
-				}
+				
 			}),
 			takeUntil(this.unsubscribe),
 			finalize(() => {
