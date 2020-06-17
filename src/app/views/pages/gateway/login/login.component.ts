@@ -16,7 +16,8 @@ import {AuthNoticeService, GatewayService, Login} from '../../../../core/23block
 @Component({
 	selector: 'app-gateway-login',
 	templateUrl: './login.component.html',
-	encapsulation: ViewEncapsulation.None
+	encapsulation: ViewEncapsulation.None,
+	styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit, OnDestroy {
 	// Public params

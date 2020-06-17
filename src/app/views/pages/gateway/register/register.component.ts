@@ -5,7 +5,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 // RxJS
 import { finalize, takeUntil, tap } from 'rxjs/operators';
 // Translate
-// FIXME import { TranslateService } from '@ngx-translate/core';
 // NGRX
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../../core/reducers';
@@ -19,7 +18,8 @@ import {environment} from '../../../../../environments/environment';
 @Component({
 	selector: 'app-gateway-register',
 	templateUrl: './register.component.html',
-	encapsulation: ViewEncapsulation.None
+	encapsulation: ViewEncapsulation.None,
+	styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit, OnDestroy {
 	registerForm: FormGroup;
@@ -41,7 +41,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 	 */
 	constructor(
 		private authNoticeService: AuthNoticeService,
-		// ANCHOR private translate: TranslateService,
+		//private translate: TranslateService,
 		private router: Router,
 		private auth: GatewayService,
 		private store: Store<AppState>,
@@ -144,15 +144,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       subscription: '318f1533-8dd9-4a7d-8b36-9b04a7c2363f',
       confirm_success_url: environment.APP_URL + '/auth/step2'})
 			.pipe(
-			tap(// ANCHOR user => {
-					// this.store.dispatch(new Register({authToken: user.accessToken}));
-					// pass notice message to the login page
-					//this.authNoticeService.setNotice(this.translate.instant('AUTH.REGISTER.SUCCESS'), 'success');
-					//this.router.navigateByUrl('/auth/login');
-				//},
-				//errors =>  { this.authNoticeService.setNotice(errors[0].detail, 'danger');
-				//}
-				),
+			tap(),
 			takeUntil(this.unsubscribe),
 			finalize(() => {
 				this.loading = false;
@@ -177,3 +169,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
 		return result;
 	}
 }
+
+
+

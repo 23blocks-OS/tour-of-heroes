@@ -1,15 +1,11 @@
-// import login css
-//@import "sass/pages/login/login-1";
-
-kt-auth, .kt-login {
-	height: 100%;
-
-	.mat-form-field {
-		width: 100%;
+.container {
+	height: 100vh;
+	display: flex;
+	flex-flow: wrap;
+	justify-content: center;
+  }
+  
+  .child {
+	  background-color: white;
+	  margin: auto;
 	}
-
-	// add extra right padding when displaying spinner in button
-	.kt-spinner {
-		padding-right: 3rem !important;
-	}
-}
