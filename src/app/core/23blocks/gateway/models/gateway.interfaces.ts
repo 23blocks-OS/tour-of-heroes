@@ -1,5 +1,4 @@
-
-import {Provider} from '@angular/core';
+import { Provider } from '@angular/core';
 import { InjectionToken } from '@angular/core';
 
 export interface Gateway23blocksOptions {
@@ -33,13 +32,15 @@ export interface Gateway23blocksOptions {
   permissionsPath?: string;
 
   oAuthBase?: string;
-  oAuthPaths?: { [key: string]: string; };
+  oAuthPaths?: { [key: string]: string };
   oAuthCallbackPath?: string;
   oAuthWindowType?: string;
-  oAuthWindowOptions?: { [key: string]: string; };
+  oAuthWindowOptions?: { [key: string]: string };
 }
 
-export const GATEWAY_23BLOCKS_SERVICE_OPTIONS = new InjectionToken('GATEWAY_23BLOCKS_SERVICE_OPTIONS');
+export const GATEWAY_23BLOCKS_SERVICE_OPTIONS = new InjectionToken(
+  'GATEWAY_23BLOCKS_SERVICE_OPTIONS'
+);
 
 export interface AuthToken {
   companyToken: string;
@@ -65,6 +66,7 @@ export interface NewUserData {
   password: string;
   username: string;
   name: string;
+  role_id?: number;
 }
 export interface NewRegistrationData {
   user: NewUserData;
@@ -97,8 +99,7 @@ export interface AuthApiResponse {
 
 // Configuration Options
 
-
-export interface Avatar {
+export interface AvatarData {
   original_name: string;
   name: string;
   url: string;
@@ -109,3 +110,62 @@ export interface Avatar {
   original_file: string;
 }
 
+export interface ProfileData {
+  first_name: string;
+  middle_name?: string;
+  last_name: string;
+  gender?: string;
+  ethnicity?: string;
+  zipcode?: string;
+  marital_status?: string;
+  birthdate?: string;
+  hhi?: string;
+  children?: string;
+  source?: string;
+  phone_number?: string;
+  email?: string;
+  preferred_device?: string;
+  preferred_language?: string;
+  payload?: string;
+}
+
+export interface DeviceData {
+  id: string;
+  pushId: string;
+  uniqueId: string;
+  deviceType: string;
+  status: string;
+  osType: string;
+  defaultDevice: string;
+  locationEnabled: string;
+  notificationsEnabled: string;
+  user?: any;
+}
+
+export interface ImpersonalizationData {
+  appid: string;
+  unique_id: string;
+  provider: string;
+  uid: string;
+  email: string;
+}
+
+export interface ConfirmationData {
+  email: string;
+  username: string;
+  uid: string;
+  role_id: number;
+}
+
+export interface GoogleUser {
+  authToken: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  name: string;
+  id: string;
+  idToken: string;
+  photoUrl: string;
+  provider: string;
+  response: any;
+}

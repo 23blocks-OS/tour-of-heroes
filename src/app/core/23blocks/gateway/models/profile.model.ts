@@ -1,7 +1,6 @@
-
 export class Profile {
-	id: number;
-	uniqueId: string;
+  id: number;
+  uniqueId: string;
   firstName: string;
   middleName: string;
   lastName: string;
@@ -13,9 +12,14 @@ export class Profile {
   hhi: string;
   children: string;
   source: string;
-	status: string;
+  phoneNumber: string;
+  email: string;
+  preferredDevice: string;
+  preferredLanguage: string;
+  payload: any;
+  status: string;
 
-	clear(): void {
-		this.id = undefined;
-	}
+  clear?(): void {
+    this.id = undefined;
+  }
 }

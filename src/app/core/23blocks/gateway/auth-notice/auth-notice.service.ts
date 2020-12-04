@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { AuthNotice } from './auth-notice.interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthNoticeService {
   onNoticeChanged$: BehaviorSubject<AuthNotice>;
@@ -12,10 +12,12 @@ export class AuthNoticeService {
     this.onNoticeChanged$ = new BehaviorSubject(null);
   }
 
-  setNotice(message: string, type?: string) {
+  setNotice(message: string, type?: string, link?: string, action?: any) {
     const notice: AuthNotice = {
       message,
-      type
+      type,
+      link,
+      action,
     };
     this.onNoticeChanged$.next(notice);
   }

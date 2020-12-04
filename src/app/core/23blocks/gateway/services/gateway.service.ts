@@ -1,12 +1,21 @@
 import { Injectable, Optional, Inject, PLATFORM_ID } from '@angular/core';
-import { ActivatedRoute, Router} from '@angular/router';
-import { HttpClient, HttpResponse, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
+import {
+  HttpClient,
+  HttpResponse,
+  HttpErrorResponse,
+  HttpHeaders,
+  HttpParams,
+} from '@angular/common/http';
 import { isPlatformServer } from '@angular/common';
 
 import { Observable, fromEvent, interval, BehaviorSubject, of } from 'rxjs';
 import { pluck, filter, share, finalize } from 'rxjs/operators';
 
-import {GATEWAY_23BLOCKS_SERVICE_OPTIONS} from '../models/gateway.interfaces';
+import {
+  ConfirmationData,
+  GATEWAY_23BLOCKS_SERVICE_OPTIONS,
+} from '../models/gateway.interfaces';
 
 import {
   SignInData,
@@ -15,18 +24,23 @@ import {
   ResetPasswordData,
   AuthApiResponse,
   Gateway23blocksOptions,
-  AuthToken, Avatar
+  AuthToken,
+  AvatarData,
+  ProfileData,
+  ImpersonalizationData,
 } from '../models/gateway.interfaces';
 
-import {User} from '../models/user.model';
-import {environment} from '../../../../../environments/environment';
-
+import { User } from '../models/user.model';
+import { environment } from '../../../../../environments/environment';
+import { ApiResponse } from '../../models/api-response.model';
+import { Store, select } from '@ngrx/store';
+import { AppState } from '../../../reducers';
+import { selectAccessToken } from '../selectors/company.selectors';
 
 @Injectable({
   providedIn: 'root',
 })
-export class GatewayService  {
-
+export class GatewayService {
   // get currentUserData(): User {
   //   return this.userData.value;
   // }
@@ -44,30 +58,43 @@ export class GatewayService  {
   }
 
   private options: Gateway23blocksOptions;
-  public authData: BehaviorSubject<AuthToken> = new BehaviorSubject<AuthToken>(null);
+  public authData: BehaviorSubject<AuthToken> = new BehaviorSubject<AuthToken>(
+    null
+  );
   public userData: BehaviorSubject<User> = new BehaviorSubject<User>(null);
   private global: Window | any;
 
   private localStorage: Storage | any = {};
+
+  // Impersonalization
+  // private appId: string;
+  // private companyToken: string;
 
   constructor(
     private http: HttpClient,
     @Inject(GATEWAY_23BLOCKS_SERVICE_OPTIONS) config: any,
     @Inject(PLATFORM_ID) private platformId: Object,
     @Optional() private activatedRoute: ActivatedRoute,
-    @Optional() private router: Router
+    @Optional() private router: Router,
+    private store: Store<AppState>
   ) {
-    this.global = (typeof window !== 'undefined') ? window : {};
+    // Impersonalization
+    // this.store.pipe(select(selectAccessToken)).subscribe((_accesstokens) => {
+    //   // console.log(_accesstokens, 'GATEWAY SERVICE');
+    //   this.appId = _accesstokens.appId;
+    //   this.companyToken = _accesstokens.companyToken;
+    // });
+
+    this.global = typeof window !== 'undefined' ? window : {};
 
     if (isPlatformServer(this.platformId)) {
-
       // Bad pratice, needs fixing
       this.global = {
         open: (): void => null,
         location: {
           href: '/',
-          origin: '/'
-        }
+          origin: '/',
+        },
       };
 
       // Bad pratice, needs fixing
@@ -79,48 +106,50 @@ export class GatewayService  {
     }
 
     const defaultOptions: Gateway23blocksOptions = {
-      apiPath:                    null,
-      apiBase:                    null,
-      APPID:						null,
+      apiPath: null,
+      apiBase: null,
+      APPID: null,
 
-      signInRedirect:             'auth/login',
-      signInPath:                 'auth/sign_in',
-      signInStoredUrlStorageKey:  null,
+      signInRedirect: 'auth/login',
+      signInPath: 'auth/sign_in',
+      signInStoredUrlStorageKey: null,
 
-      signOutPath:                'auth/sign_out',
-      validateTokenPath:          'auth/validate_token',
-      signOutFailedValidate:      false,
+      signOutPath: 'auth/sign_out',
+      validateTokenPath: 'auth/validate_token',
+      signOutFailedValidate: false,
 
-      registerAccountPath:        'auth',
-      deleteAccountPath:          'auth',
-      registerAccountCallback:    this.global.location.href,
+      registerAccountPath: 'auth',
+      deleteAccountPath: 'auth',
+      registerAccountCallback: this.global.location.href,
 
-      updatePasswordPath:         'auth/password',
-      addAvatarPath:		 		'/users/avatar',
+      updatePasswordPath: 'auth/password',
+      addAvatarPath: '/users/avatar',
 
-      resetPasswordPath:          'auth/password',
-      resetPasswordCallback:      this.global.location.href,
+      resetPasswordPath: 'auth/password',
+      resetPasswordCallback: this.global.location.href,
 
-      loginField:                 'email',
+      loginField: 'email',
 
-      rolesPath:                 	'roles',
-      permissionsPath:			'permissions',
+      rolesPath: 'roles',
+      permissionsPath: 'permissions',
 
-      oAuthBase:                  this.global.location.origin,
+      oAuthBase: this.global.location.origin,
       oAuthPaths: {
-        github:                   'auth/github'
+        github: 'auth/github',
       },
-      oAuthCallbackPath:          'oauth_callback',
-      oAuthWindowType:            'newWindow',
-      oAuthWindowOptions:         null,
+      oAuthCallbackPath: 'oauth_callback',
+      oAuthWindowType: 'newWindow',
+      oAuthWindowOptions: null,
     };
 
     const mergedOptions = (Object as any).assign(defaultOptions, config);
     this.options = mergedOptions;
 
     if (this.options.apiBase === null) {
-      console.warn(`[Auth 23Blocks] You have not configured 'apiBase', which may result in security issues. ` +
-        `Please refer to the documentation at https://github.com/neroniaky/angular-token/wiki`);
+      console.warn(
+        `[Auth 23Blocks] You have not configured 'apiBase', which may result in security issues. ` +
+          `Please refer to the documentation at https://github.com/neroniaky/angular-token/wiki`
+      );
     }
 
     this.tryLoadAuthData();
@@ -133,52 +162,68 @@ export class GatewayService  {
    */
 
   // Register User
-  registerUser(registrationData: NewRegistrationData): Observable<AuthApiResponse> {
+  registerUser(
+    registrationData: NewRegistrationData
+  ): Observable<AuthApiResponse> {
     // console.log(registerData);
     this.clearAuthData();
     registrationData.confirm_success_url = this.options.registerAccountCallback;
-    return this.http.post<AuthApiResponse>(this.getApiPath() + this.options.registerAccountPath,  registrationData);
+    return this.http.post<AuthApiResponse>(
+      this.getApiPath() + this.options.registerAccountPath,
+      registrationData
+    );
   }
 
   // Delete Account
   deleteAccount(): Observable<AuthApiResponse> {
-    return this.http.delete<AuthApiResponse>(this.getServerPath() + this.options.deleteAccountPath);
+    return this.http.delete<AuthApiResponse>(
+      this.getServerPath() + this.options.deleteAccountPath
+    );
   }
 
   // Sign in request and set storage
-  signIn(signInData: SignInData, additionalData?: any): Observable<AuthApiResponse> {
+  signIn(
+    signInData: SignInData,
+    additionalData?: any
+  ): Observable<AuthApiResponse> {
     this.clearAuthData();
     const body = {
       [this.options.loginField]: signInData.login,
-      password: signInData.password
-      };
+      password: signInData.password,
+    };
 
-    return this.http.post<AuthApiResponse>(this.getServerPath() + this.options.signInPath, body);
+    return this.http.post<AuthApiResponse>(
+      this.getServerPath() + this.options.signInPath,
+      body
+    );
   }
 
   signInOAuth(oAuthType: string) {
-
     const oAuthPath: string = this.getOAuthPath(oAuthType);
     const callbackUrl = `${this.global.location.origin}/${this.options.oAuthCallbackPath}`;
     const oAuthWindowType: string = this.options.oAuthWindowType;
-    const authUrl: string = this.getOAuthUrl(oAuthPath, callbackUrl, oAuthWindowType);
+    const authUrl: string = this.getOAuthUrl(
+      oAuthPath,
+      callbackUrl,
+      oAuthWindowType
+    );
 
     if (oAuthWindowType === 'newWindow') {
       const oAuthWindowOptions = this.options.oAuthWindowOptions;
       let windowOptions = '';
 
       if (oAuthWindowOptions) {
-      for (const key in oAuthWindowOptions) {
-        if (oAuthWindowOptions.hasOwnProperty(key)) {
-        windowOptions += `,${key}=${oAuthWindowOptions[key]}`;
+        for (const key in oAuthWindowOptions) {
+          if (oAuthWindowOptions.hasOwnProperty(key)) {
+            windowOptions += `,${key}=${oAuthWindowOptions[key]}`;
+          }
         }
-      }
       }
 
       const popup = window.open(
-      authUrl,
-      '_blank',
-      `closebuttoncaption=Cancel${windowOptions}`
+        authUrl,
+        '_blank',
+        `closebuttoncaption=Cancel${windowOptions}`
       );
       return this.requestCredentialsViaPostMessage(popup);
     } else if (oAuthWindowType === 'sameWindow') {
@@ -190,42 +235,49 @@ export class GatewayService  {
   }
 
   processOAuthCallback(): void {
-      this.getAuthDataFromParams();
+    this.getAuthDataFromParams();
   }
 
   // Sign out request and delete storage
   signOut(): Observable<AuthApiResponse> {
-    return this.http.delete<AuthApiResponse>(this.getServerPath() + this.options.signOutPath)
-    // Only remove the localStorage and clear the data after the call
-      .pipe(
-      finalize(() => {
-        this.clearAuthData();
-        }
-      )
-      );
+    return (
+      this.http
+        .delete<AuthApiResponse>(
+          this.getServerPath() + this.options.signOutPath
+        )
+        // Only remove the localStorage and clear the data after the call
+        .pipe(
+          finalize(() => {
+            this.clearAuthData();
+          })
+        )
+    );
   }
 
   // Validate token request
   validateToken(): Observable<AuthApiResponse> {
     // console.log('Validate Token');
-    return this.http.get<AuthApiResponse>(this.getServerPath() + this.options.validateTokenPath);
+    return this.http.get<AuthApiResponse>(
+      this.getServerPath() + this.options.validateTokenPath
+    );
   }
 
   // Update password request
-  updatePassword(updatePasswordData: UpdatePasswordData): Observable<AuthApiResponse> {
-
+  updatePassword(
+    updatePasswordData: UpdatePasswordData
+  ): Observable<AuthApiResponse> {
     let args: any;
 
     if (updatePasswordData.passwordCurrent == null) {
       args = {
-        password:               updatePasswordData.password,
-        password_confirmation:  updatePasswordData.passwordConfirmation
+        password: updatePasswordData.password,
+        password_confirmation: updatePasswordData.passwordConfirmation,
       };
     } else {
       args = {
-        current_password:       updatePasswordData.passwordCurrent,
-        password:               updatePasswordData.password,
-        password_confirmation:  updatePasswordData.passwordConfirmation
+        current_password: updatePasswordData.passwordCurrent,
+        password: updatePasswordData.password,
+        password_confirmation: updatePasswordData.passwordConfirmation,
       };
     }
 
@@ -234,51 +286,260 @@ export class GatewayService  {
     }
 
     const body = args;
-    return this.http.put<AuthApiResponse>(this.getServerPath() + this.options.updatePasswordPath, body);
+    return this.http.put<AuthApiResponse>(
+      this.getServerPath() + this.options.updatePasswordPath,
+      body
+    );
   }
 
   // Reset password request
-  resetPassword(resetPasswordData: ResetPasswordData): Observable<AuthApiResponse> {
-
+  resetPassword(
+    resetPasswordData: ResetPasswordData
+  ): Observable<AuthApiResponse> {
     const body = {
       [this.options.loginField]: resetPasswordData.login,
-      redirect_url: this.options.resetPasswordCallback
+      redirect_url: this.options.resetPasswordCallback,
     };
 
-    return this.http.post<AuthApiResponse>(this.getServerPath() + this.options.resetPasswordPath, body);
+    return this.http.post<AuthApiResponse>(
+      this.getServerPath() + this.options.resetPasswordPath,
+      body
+    );
   }
 
   // Avatar
-  addAvatar(avatar: Avatar) {
-    return this.http.post(environment.API_23GATEWAY_URL + this.options.addAvatarPath, {avatar});
+  addAvatar(avatarData: AvatarData) {
+    return this.http.post(
+      environment.API_23GATEWAY_URL + this.options.addAvatarPath,
+      { avatarData }
+    );
   }
 
-  // Avatar
   getAvatar(userId: string): Observable<AuthApiResponse> {
     // console.log('Avatar Service');
-    return this.http.get(environment.API_23GATEWAY_URL + '/users/' + userId + '/avatar');
+    return this.http.get(
+      environment.API_23GATEWAY_URL + '/users/' + userId + '/avatar'
+    );
+  }
+
+  getAvatarImp(userId: string): Observable<AuthApiResponse> {
+    // console.log('Avatar Service');
+    const httpOptions = {
+      headers: new HttpHeaders({
+        // APPID: this.appId,
+        // 'company-token': this.companyToken,
+      }),
+    };
+    return this.http.get(
+      environment.API_23GATEWAY_URL + '/users/' + userId + '/avatar',
+      httpOptions
+    );
+  }
+
+  getProfile(userId: string): Observable<AuthApiResponse> {
+    // console.log('Avatar Service');
+    const httpOptions = {
+      headers: new HttpHeaders({
+        // APPID: this.appId,
+        // 'company-token': this.companyToken,
+      }),
+    };
+    return this.http.get(
+      environment.API_23GATEWAY_URL + '/users/' + userId + '/profile',
+      httpOptions
+    );
+  }
+
+  getDevices(
+    userId: string,
+    page?: number,
+    perPage?: number
+  ): Observable<ApiResponse> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        // APPID: this.appId,
+        // 'company-token': this.companyToken,
+      }),
+      params: new HttpParams({
+        fromObject: {
+          ...(page && { ['page']: page.toString() }),
+          ...(perPage && { ['records']: perPage.toString() }),
+        },
+      }),
+    };
+    return this.http.get(
+      environment.API_23GATEWAY_URL + '/users/' + userId + '/devices',
+      httpOptions
+    );
+  }
+
+  // Profile
+  addProfile(profileData: ProfileData): Observable<ApiResponse> {
+    return this.http.post(environment.API_23GATEWAY_URL + '/users/profile', {
+      profile: profileData,
+    });
   }
 
   // Permissions
   getAllPermissions(): Observable<AuthApiResponse> {
     // console.log('Permissions Service Call');
-    return this.http.get<AuthApiResponse>(this.getServerPath() + this.options.permissionsPath);
+    return this.http.get<AuthApiResponse>(
+      this.getServerPath() + this.options.permissionsPath
+    );
   }
 
   getAllRoles(): Observable<AuthApiResponse> {
     // console.log('Roles Service Call');
-    return this.http.get<AuthApiResponse>(this.getServerPath() + this.options.rolesPath);
+    return this.http.get<AuthApiResponse>(
+      this.getServerPath() + this.options.rolesPath
+    );
+  }
+
+  public getRoles(page?: number, perPage?: number): Observable<ApiResponse> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        // APPID: this.appId,
+        // 'company-token': this.companyToken,
+      }),
+      params: new HttpParams({
+        fromObject: {
+          ...(page && { ['page']: page.toString() }),
+          ...(perPage && { ['records']: perPage.toString() }),
+        },
+      }),
+    };
+    return this.http.get(
+      environment.API_23GATEWAY_URL + '/roles/',
+      httpOptions
+    );
+  }
+
+  getUser(userId: string): Observable<AuthApiResponse> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        // APPID: this.appId,
+        // 'company-token': this.companyToken,
+      }),
+    };
+    return this.http.get(
+      environment.API_23GATEWAY_URL + '/users/' + userId,
+      httpOptions
+    );
+  }
+
+  getUsers(
+    query: string,
+    page?: number,
+    perPage?: number
+  ): Observable<ApiResponse> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        // APPID: this.appId,
+        // 'company-token': this.companyToken,
+      }),
+      params: new HttpParams({
+        fromObject: {
+          ...(query && { ['search']: query.toString() }),
+          ...(page && { ['page']: page.toString() }),
+          ...(perPage && { ['records']: perPage.toString() }),
+        },
+      }),
+    };
+    return this.http.get(
+      environment.API_23GATEWAY_URL + '/users/',
+      httpOptions
+    );
+  }
+
+  getSubscriptions(
+    query?: string,
+    page?: number,
+    perPage?: number
+  ): Observable<ApiResponse> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        // APPID: this.appId,
+        // 'company-token': this.companyToken,
+      }),
+      params: new HttpParams({
+        fromObject: {
+          ...(query && { ['search']: query.toString() }),
+          ...(page && { ['page']: page.toString() }),
+          ...(perPage && { ['records']: perPage.toString() }),
+        },
+      }),
+    };
+    return this.http.get(
+      environment.API_23GATEWAY_URL + '/subscription_models/',
+      httpOptions
+    );
   }
 
   // Account
-  getCompany(urlId:string): Observable<AuthApiResponse> {
+  getCompany(urlId: string): Observable<AuthApiResponse> {
     // console.log('Get Company');
     return this.http.get(environment.API_23GATEWAY_URL + '/companies/' + urlId);
   }
 
   getCompanies(userId: string): Observable<AuthApiResponse> {
     // console.log('Get Accounts');
-    return this.http.get(environment.API_23GATEWAY_URL + '/users/' + userId + '/companies');
+    return this.http.get(
+      environment.API_23GATEWAY_URL + '/users/' + userId + '/companies'
+    );
+  }
+
+  accessRequest(
+    appId: string,
+    appUrl: string,
+    userData: ImpersonalizationData
+  ): Observable<AuthApiResponse> {
+    console.log('Access Requested');
+    return this.http.post(
+      environment.API_23GATEWAY_URL + '/companies/' + appUrl + '/access',
+      { user: userData }
+    );
+  }
+
+  // Re-send account confirmation email
+
+  reSendConfirmationEmail(
+    userUniqueId: string,
+    confirmationData: ConfirmationData
+  ): Observable<ApiResponse> {
+    const confirm_success_url = this.options.registerAccountCallback;
+    return this.http.post(
+      environment.API_23GATEWAY_URL +
+        '/users/' +
+        userUniqueId +
+        '/confirmation',
+      { confirm_success_url, user: confirmationData }
+    );
+  }
+
+  // Re-send account confirmation email with email only
+
+  reSendEmailOnly(email: string): Observable<ApiResponse> {
+    const confirm_success_url = this.options.registerAccountCallback;
+    return this.http.post(environment.API_23GATEWAY_URL + '/users/reconfirm', {
+      user: { email },
+      confirm_success_url,
+    });
+  }
+
+  // Login with Facebook
+
+  facebookLogin(token: string): Observable<ApiResponse> {
+    return this.http.post(environment.API_23GATEWAY_URL + '/auth/facebook', {
+      token,
+    });
+  }
+
+  // Login with Google
+
+  googleLogin(token: string): Observable<ApiResponse> {
+    return this.http.post(environment.API_23GATEWAY_URL + '/auth/google', {
+      token,
+    });
   }
 
   /**
@@ -302,7 +563,7 @@ export class GatewayService  {
   }
 
   private getServerPath(): string {
-    return this.getApiPath();  // + this.getUserPath();
+    return this.getApiPath(); // + this.getUserPath();
   }
 
   private getOAuthPath(oAuthType: string): string {
@@ -317,16 +578,19 @@ export class GatewayService  {
     return oAuthPath;
   }
 
-  private getOAuthUrl(oAuthPath: string, callbackUrl: string, windowType: string): string {
+  private getOAuthUrl(
+    oAuthPath: string,
+    callbackUrl: string,
+    windowType: string
+  ): string {
     let url: string;
 
-    url =   `${this.options.oAuthBase}/${oAuthPath}`;
-    url +=  `?omniauth_window_type=${windowType}`;
-    url +=  `&auth_origin_url=${encodeURIComponent(callbackUrl)}`;
+    url = `${this.options.oAuthBase}/${oAuthPath}`;
+    url += `?omniauth_window_type=${windowType}`;
+    url += `&auth_origin_url=${encodeURIComponent(callbackUrl)}`;
 
     return url;
   }
-
 
   /**
    *
@@ -343,12 +607,14 @@ export class GatewayService  {
     }
 
     if (this.authData) {
-        // this.validateToken();
+      // this.validateToken();
     }
   }
 
   // Parse Auth data from response
-  public getAuthHeadersFromResponse(data: HttpResponse<any> | HttpErrorResponse): void {
+  public getAuthHeadersFromResponse(
+    data: HttpResponse<any> | HttpErrorResponse
+  ): void {
     const headers = data.headers;
 
     // console.log(headers);
@@ -360,7 +626,7 @@ export class GatewayService  {
       expiry: headers.get('expiry'),
       tokenType: headers.get('token-type'),
       uid: headers.get('uid'),
-      appid: environment.APPID
+      appid: environment.APPID,
     };
 
     this.setAuthData(authData);
@@ -369,13 +635,13 @@ export class GatewayService  {
   // Parse Auth data from post message
   private getAuthDataFromPostMessage(data: any): void {
     const authData: AuthToken = {
-      companyToken:   data.company_token,
-      accessToken:    data.auth_token,
-      client:         data.client_id,
-      expiry:         data.expiry,
-      tokenType:      'Bearer',
-      uid:            data.uid,
-      appid: data.appid
+      companyToken: data.company_token,
+      accessToken: data.auth_token,
+      client: data.client_id,
+      expiry: data.expiry,
+      tokenType: 'Bearer',
+      uid: data.uid,
+      appid: data.appid,
     };
 
     this.setAuthData(authData);
@@ -383,7 +649,6 @@ export class GatewayService  {
 
   // Try to get auth data from storage.
   public getAuthDataFromStorage(): void {
-
     const authData: AuthToken = {
       companyToken: this.localStorage.getItem('companyToken'),
       accessToken: this.localStorage.getItem('accessToken'),
@@ -401,24 +666,22 @@ export class GatewayService  {
 
   // Try to get auth data from url parameters.
   private getAuthDataFromParams(): void {
-
-  this.activatedRoute.queryParamMap.subscribe(queryParams => {
-    const authData: AuthToken = {
-      accessToken: queryParams.get('access-token'),
-      client: queryParams.get('client_id'),
-      expiry: queryParams.get('expiry'),
-      tokenType: 'Bearer',
-      uid: queryParams.get('uid'),
-      appid: queryParams.get('appid'),
-      companyToken: 'NA'
-    };
-
-    if (this.checkAuthData(authData)) {
-      this.authData.next(authData);
-    }
-
-  });
-}
+    this.activatedRoute.queryParamMap.subscribe((queryParams) => {
+      const authData: AuthToken = {
+        accessToken: queryParams.get('access-token'),
+        client: queryParams.get('client_id'),
+        expiry: queryParams.get('expiry'),
+        tokenType: 'Bearer',
+        uid: queryParams.get('uid'),
+        appid: queryParams.get('appid'),
+        companyToken: 'NA',
+      };
+      if (this.checkAuthData(authData)) {
+        this.setAuthData(authData);
+        this.authData.next(authData);
+      }
+    });
+  }
 
   /**
    *
@@ -429,7 +692,6 @@ export class GatewayService  {
   // Write auth data to storage
   private setAuthData(authData: AuthToken): void {
     if (this.checkAuthData(authData)) {
-
       this.authData.next(authData);
 
       this.localStorage.setItem('companyToken', authData.companyToken);
@@ -463,15 +725,14 @@ export class GatewayService  {
 
   // Check if auth data complete and if response token is newer
   private checkAuthData(authData: AuthToken): boolean {
-
     if (
-        authData.companyToken != null &&
-        authData.accessToken != null &&
-        authData.client != null &&
-        authData.expiry != null &&
-        authData.tokenType != null &&
-        authData.uid != null &&
-        authData.appid != null
+      authData.companyToken != null &&
+      authData.accessToken != null &&
+      authData.client != null &&
+      authData.expiry != null &&
+      authData.tokenType != null &&
+      authData.uid != null &&
+      authData.appid != null
     ) {
       if (this.authData.value != null) {
         return authData.expiry >= this.authData.value.expiry;
@@ -480,7 +741,6 @@ export class GatewayService  {
     }
     return false;
   }
-
 
   /**
    *
@@ -496,9 +756,7 @@ export class GatewayService  {
       filter(this.oAuthWindowResponseFilter)
     );
 
-    responseObserv.subscribe(
-      this.getAuthDataFromPostMessage.bind(this)
-    );
+    responseObserv.subscribe(this.getAuthDataFromPostMessage.bind(this));
 
     const pollerSubscription = pollerObserv.subscribe(() => {
       if (authWindow.closed) {
@@ -512,10 +770,11 @@ export class GatewayService  {
   }
 
   private oAuthWindowResponseFilter(data: any): any {
-    if (data.message === 'deliverCredentials' || data.message === 'authFailure') {
+    if (
+      data.message === 'deliverCredentials' ||
+      data.message === 'authFailure'
+    ) {
       return data;
     }
   }
-
-
 }

@@ -1,6 +1,9 @@
 
 // Models
-
+export { Country } from './models/country.model';
+export { State } from './models/state.model';
+export { County } from './models/county.model';
+export { City } from './models/city.model';
 export { Role } from './models/role.model';
 export { Subscription } from './models/subscription.model';
 export { Profile } from './models/profile.model';
@@ -51,7 +54,11 @@ export {
   CompaniesRequested,
   CompaniesLoaded,
   CompanyLoaded,
-  CompanyRequested
+  CompanyRequested,
+  AccessRequested,
+  AccessGranted,
+  CompanyActionTypes,
+  CompanyActions
 } from '../gateway/actions/company.actions'
 // export {
 //     UserCreated,
@@ -117,6 +124,10 @@ export {
   selectCompanyById,
   selectAllCompaniesIds,
   isCompaniesLoaded,
+  selectCompany,
+  isCompanyLoaded,
+  isAccessGranted,
+  selectAccessToken
 } from '../gateway/selectors/company.selectors'
 // export {
 //     selectUserById,
@@ -131,7 +142,7 @@ export {
 //
 // GUARDS
 export { GatewayGuard } from './guards/gateway.guard';
-// export { ModuleGuard } from './guards/module.guard';
+// export { ModuleGuard } from './guards/module.guards';
 //
 
 export { AuthNotice } from '../gateway/auth-notice/auth-notice.interface';
