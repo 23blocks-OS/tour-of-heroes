@@ -2,6 +2,7 @@ import { Action } from '@ngrx/store';
 import { User } from '..';
 import { Avatar } from '..';
 import { Company } from '..';
+import { Subscription } from '../models/subscription.model';
 
 export enum AuthActionTypes {
   Login = '[Login] Action',
@@ -11,24 +12,26 @@ export enum AuthActionTypes {
   UserLoaded = '[Load User] API',
   AvatarRequested = '[Request Avatar] API',
   AvatarLoaded = '[Load Avatar] API',
+  SubscriptionRequested = '[Request Subscription] API',
+  SubscriptionLoaded = '[Load Subscription] API',
 }
 
 export class Login implements Action {
   readonly type = AuthActionTypes.Login;
-  constructor(public payload: { authToken: string }) { }
+  constructor(public payload: { authToken: string }) {}
 }
 
 export class Logout implements Action {
-    readonly type = AuthActionTypes.Logout;
+  readonly type = AuthActionTypes.Logout;
 }
 
 export class Register implements Action {
   readonly type = AuthActionTypes.Register;
-  constructor(public payload: { authToken: string }) { }
+  constructor(public payload: { authToken: string }) {}
 }
 
 export class UserRequested implements Action {
-    readonly type = AuthActionTypes.UserRequested;
+  readonly type = AuthActionTypes.UserRequested;
 }
 
 export class UserLoaded implements Action {
@@ -53,7 +56,26 @@ export class AvatarRequested implements Action {
 
 export class AvatarLoaded implements Action {
   readonly type = AuthActionTypes.AvatarLoaded;
-  constructor(public payload: { avatar: Avatar }) { }
+  constructor(public payload: { avatar: Avatar }) {}
 }
 
-export type AuthActions = Login | Logout | UserRequested | UserLoaded | AvatarRequested | AvatarLoaded | Register
+export class SubscriptionRequested implements Action {
+  readonly type = AuthActionTypes.SubscriptionRequested;
+  constructor(public payload: { subscriptionId: string; userId?: string }) {}
+}
+
+export class SubscriptionLoaded implements Action {
+  readonly type = AuthActionTypes.SubscriptionLoaded;
+  constructor(public payload: { subscription: Subscription }) {}
+}
+
+export type AuthActions =
+  | Login
+  | Logout
+  | UserRequested
+  | UserLoaded
+  | AvatarRequested
+  | AvatarLoaded
+  | Register
+  | SubscriptionRequested
+  | SubscriptionLoaded;

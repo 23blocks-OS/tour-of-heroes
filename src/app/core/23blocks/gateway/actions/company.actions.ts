@@ -6,12 +6,15 @@ import { Update } from '@ngrx/entity';
 // Models
 import { Company } from '../models/company.model';
 import {QueryParamsModel} from '../../tools/query-params.model';
+import {ImpersonalizationData} from '../models/gateway.interfaces';
 
 export enum CompanyActionTypes {
     CompaniesRequested = '[Companies Requested] API',
     CompaniesLoaded = '[Companies Loaded] API',
     CompanyRequested = '[Company Requested] API',
     CompanyLoaded = '[Company Loaded] API',
+    AccessRequested = '[CompanyAccess Requested] API',
+    AccessGranted = '[CompanyAccess Granted] API'
     // RoleOnServerCreated = '[Edit Role Dialog] Role On Server Created',
     // RoleCreated = '[Edit Roles Dialog] Roles Created',
     // RoleUpdated = '[Edit Role Dialog] Role Updated',
@@ -79,6 +82,16 @@ export class CompanyLoaded implements Action {
   readonly type = CompanyActionTypes.CompanyLoaded;
   constructor(public payload: { company: Company }) { }
 }
+
+export class AccessRequested implements Action {
+  readonly type = CompanyActionTypes.AccessRequested;
+  constructor(public payload: { appId: string, appUrl: string, userData: ImpersonalizationData }) {}
+}
+
+export class AccessGranted implements Action {
+  readonly type = CompanyActionTypes.AccessGranted;
+  constructor(public payload: { appId: string, companyToken: string }) { }
+}
 // export class RolesPageToggleLoading implements Action {
 //     readonly type = RoleActionTypes.RolesPageToggleLoading;
 //     constructor(public payload: { isLoading: boolean }) { }
@@ -90,7 +103,8 @@ export class CompanyLoaded implements Action {
 // }
 
 export type CompanyActions = CompaniesLoaded | CompaniesRequested |
-  CompanyRequested | CompanyLoaded
+  CompanyRequested | CompanyLoaded |
+  AccessRequested | AccessGranted
 
 //   RoleCreated
 // | RoleUpdated

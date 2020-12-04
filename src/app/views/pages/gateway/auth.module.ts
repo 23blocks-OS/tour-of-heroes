@@ -5,10 +5,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 // import { HTTP_INTERCEPTORS } from '@angular/common/http';
 // Material
-import {MatButtonModule} from '@angular/material/button';
-import {MatCheckboxModule} from '@angular/material/checkbox';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInputModule} from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 // Translate
 import { TranslateModule } from '@ngx-translate/core';
 // NGRX
@@ -23,87 +23,95 @@ import { RegisterComponent } from './register/register.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { AuthNoticeComponent } from './auth-notice/auth-notice.component';
 // Auth
-import {AuthEffects, GatewayGuard, authReducer } from '../../../core/23blocks/gateway';
+import {
+  AuthEffects,
+  GatewayGuard,
+  authReducer,
+} from '../../../core/23blocks/gateway';
 import { environment } from '../../../../environments/environment';
 
 import { Step2Component } from './step2/step2.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { TokenExpiredComponent } from './token-expired/token-expired.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { MatDialogModule } from '@angular/material/dialog';
+import { FacebookButtonComponent } from './facebook-button/facebook-button.component';
+import { GoogleButtonComponent } from './google-button/google-button.component';
 
 const routes: Routes = [
-	{
-		path: '',
-		component: AuthComponent,
-		children: [
-			{
-				path: '',
-				redirectTo: 'login',
-				pathMatch: 'full'
-			},
-			{
-				path: 'login',
-				component: LoginComponent,
-				data: {returnUrl: window.location.pathname}
-			},
-			{
-				path: 'step2',
-				component: Step2Component
-			},
-			{
-				path: 'register',
-				component: RegisterComponent
-			},
-			{
-				path: 'forgot-password',
-				component: ForgotPasswordComponent,
-			},
-			{
-				path: 'token-expired',
-				component: TokenExpiredComponent,
-			},
-			{
-				path: 'change-password',
-				component: ChangePasswordComponent,
-			}
-		]
-	}
+  {
+    path: '',
+    component: AuthComponent,
+    children: [
+      {
+        path: '',
+        redirectTo: 'login',
+        pathMatch: 'full',
+      },
+      {
+        path: 'login',
+        component: LoginComponent,
+        data: { returnUrl: window.location.pathname },
+      },
+      {
+        path: 'step2',
+        component: Step2Component,
+      },
+      {
+        path: 'register',
+        component: RegisterComponent,
+      },
+      {
+        path: 'forgot-password',
+        component: ForgotPasswordComponent,
+      },
+      {
+        path: 'token-expired',
+        component: TokenExpiredComponent,
+      },
+      {
+        path: 'change-password',
+        component: ChangePasswordComponent,
+      },
+    ],
+  },
 ];
 
-
 @NgModule({
-	imports: [
-		CommonModule,
-		FormsModule,
-		ReactiveFormsModule,
-		MatButtonModule,
-		RouterModule.forChild(routes),
-		MatInputModule,
-		MatFormFieldModule,
-		MatCheckboxModule,
-		TranslateModule.forChild(),
-		StoreModule.forFeature('auth', authReducer),
-		EffectsModule.forFeature([AuthEffects])
-	],
-	exports: [AuthComponent],
-	declarations: [
-		AuthComponent,
-		LoginComponent,
-		RegisterComponent,
-		ForgotPasswordComponent,
-		AuthNoticeComponent,
-		Step2Component,
-		ChangePasswordComponent,
-		TokenExpiredComponent
-	]
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    RouterModule.forChild(routes),
+    MatInputModule,
+    MatFormFieldModule,
+    MatCheckboxModule,
+    TranslateModule.forChild(),
+    StoreModule.forFeature('auth', authReducer),
+    EffectsModule.forFeature([AuthEffects]),
+    FontAwesomeModule,
+    MatDialogModule,
+  ],
+  exports: [AuthComponent],
+  declarations: [
+    AuthComponent,
+    LoginComponent,
+    RegisterComponent,
+    ForgotPasswordComponent,
+    AuthNoticeComponent,
+    Step2Component,
+    ChangePasswordComponent,
+    TokenExpiredComponent,
+    FacebookButtonComponent,
+    GoogleButtonComponent,
+  ],
 })
-
 export class AuthModule {
-	static forRoot(): ModuleWithProviders {
-		return {
-			ngModule: AuthModule,
-			providers: [
-				GatewayGuard
-			]
-		};
-	}
+  static forRoot(): ModuleWithProviders {
+    return {
+      ngModule: AuthModule,
+      providers: [GatewayGuard],
+    };
+  }
 }
