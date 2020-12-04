@@ -3,6 +3,7 @@ import {AuthActions, AuthActionTypes} from '../actions/auth.actions';
 // Models
 import {User} from '../models/user.model';
 import {Avatar} from '../models/avatar.model';
+import {Subscription} from '../models/subscription.model';
 
 export interface AuthState {
   loggedIn: boolean;
@@ -13,6 +14,8 @@ export interface AuthState {
   authToken: string;
   isUserLoaded: boolean;
   isAvatarLoaded: boolean;
+  subscription: Subscription;
+  isSubscriptionLoaded: boolean;
 }
 
 export const initialAuthState: AuthState = {
@@ -24,13 +27,19 @@ export const initialAuthState: AuthState = {
   authToken: undefined,
   isUserLoaded: false,
   isAvatarLoaded: false,
+  subscription: undefined,
+  isSubscriptionLoaded: false
 };
 
-export function authReducer(state = initialAuthState, action: AuthActions): AuthState {
+export function authReducer(
+  state = initialAuthState,
+  action: AuthActions
+): AuthState {
   switch (action.type) {
     case AuthActionTypes.Login: {
       const _token: string = action.payload.authToken;
       return {
+        ...state,
         loggedIn: true,
         authToken: _token,
         uniqueId: undefined,
@@ -45,6 +54,7 @@ export function authReducer(state = initialAuthState, action: AuthActions): Auth
     case AuthActionTypes.Register: {
       const _token: string = action.payload.authToken;
       return {
+        ...state,
         loggedIn: true,
         authToken: _token,
         uniqueId: undefined,
@@ -52,7 +62,7 @@ export function authReducer(state = initialAuthState, action: AuthActions): Auth
         user: undefined,
         isUserLoaded: false,
         avatar: undefined,
-        isAvatarLoaded: false,
+        isAvatarLoaded: false
       };
     }
 
@@ -92,8 +102,18 @@ export function authReducer(state = initialAuthState, action: AuthActions): Auth
       };
     }
 
+    case AuthActionTypes.SubscriptionLoaded: {
+      // console.log('Reducer: Subscription Loaded');
+      const _userSubscription: Subscription = action.payload.subscription;
+
+      return {
+        ...state,
+        subscription: _userSubscription,
+        isSubscriptionLoaded: true
+      };
+    }
+
     default:
       return state;
-    }
+  }
 }
-

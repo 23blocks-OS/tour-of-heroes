@@ -1,67 +1,105 @@
 <div class="box">
-  <img src="./assets/media/logos/Logo_hg.png">
-    <div class="text-center">
-      <h3 class="font-size-h1">Sign In</h3>
-    </div>
+  <img src="./assets/media/logos/Logo_hg.png" />
+  <div class="text-center">
+    <h3 class="font-size-h1">Sign In</h3>
+  </div>
 
   <!--  // NOTE This is the purple box
     <kt-auth-notice></kt-auth-notice>
 
 -->
-    <form class="form" [formGroup]="loginForm" autocomplete="off" novalidate="novalidate" id="kt_login_form" [style.fontSize.px]=14>
-      <div class="field2-login">
-        <mat-form-field class="field" appearance="fill">
-          <!--<mat-label>Email</mat-label> -->
-          <input matInput type="email" placeholder="Email" formControlName="email"
-            autocomplete="off" />
-            <!-- // FIXME <mat-icon matSuffix>sentiment_very_satisfied</mat-icon> -->
-          <mat-error *ngIf="isControlHasError('email', 'required')">
-            <strong>Required field</strong>
-          </mat-error>
-          <mat-error *ngIf="isControlHasError('email', 'email')">
-            <strong>Wrong</strong>
-          </mat-error>
-          <mat-error *ngIf="isControlHasError('email', 'minlength')">
-            <strong>Min 3</strong>
-          </mat-error>
-          <mat-error *ngIf="isControlHasError('email', 'maxlength')">
-            <strong>Max 320</strong>
-          </mat-error>
-        </mat-form-field>
-      </div>
-      <div class="field2-login">
-        <mat-form-field class="field" appearance="fill"> 
-          <!-- <mat-label>Password</mat-label>-->
-          <input matInput type="password" placeholder="Password"
-            formControlName="password" autocomplete="off" />
-          <mat-error *ngIf="isControlHasError('password', 'required')">
-            <strong>Required field</strong>
-          </mat-error>
-          <mat-error *ngIf="isControlHasError('password', 'minlength')">
-            <strong>Min 3</strong>
-          </mat-error>
-          <mat-error *ngIf="isControlHasError('password', 'maxlength')">
-            <strong>Max 100</strong>
-          </mat-error>
-        </mat-form-field>
-      </div>
-      <!--begin::Action-->
-      <!--<div class="d-flex flex-wrap justify-content-start">
+  <form
+    class="form"
+    [formGroup]="loginForm"
+    autocomplete="off"
+    novalidate="novalidate"
+    id="kt_login_form"
+    [style.fontSize.px]="14"
+  >
+    <div class="field2-login">
+      <mat-form-field class="field" appearance="fill">
+        <!--<mat-label>Email</mat-label> -->
+        <input
+          matInput
+          type="email"
+          placeholder="Email"
+          formControlName="email"
+          autocomplete="off"
+        />
+        <!-- // FIXME <mat-icon matSuffix>sentiment_very_satisfied</mat-icon> -->
+        <mat-error *ngIf="isControlHasError('email', 'required')">
+          <strong>Required field</strong>
+        </mat-error>
+        <mat-error *ngIf="isControlHasError('email', 'email')">
+          <strong>Wrong</strong>
+        </mat-error>
+        <mat-error *ngIf="isControlHasError('email', 'minlength')">
+          <strong>Min 3</strong>
+        </mat-error>
+        <mat-error *ngIf="isControlHasError('email', 'maxlength')">
+          <strong>Max 320</strong>
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div class="field2-login mt-4">
+      <mat-form-field class="field" appearance="fill">
+        <!-- <mat-label>Password</mat-label>-->
+        <input
+          matInput
+          type="password"
+          placeholder="Password"
+          formControlName="password"
+          autocomplete="off"
+        />
+        <mat-error *ngIf="isControlHasError('password', 'required')">
+          <strong>Required field</strong>
+        </mat-error>
+        <mat-error *ngIf="isControlHasError('password', 'minlength')">
+          <strong>Min 3</strong>
+        </mat-error>
+        <mat-error *ngIf="isControlHasError('password', 'maxlength')">
+          <strong>Max 100</strong>
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <!--begin::Action-->
+    <!--<div class="d-flex flex-wrap justify-content-start">
       <mat-checkbox>Remember me</mat-checkbox>
     </div>-->
-    <div class="button-container">
-    <button style="background-color: #EF8533" id="kt_login_signin_submit" (click)="submit()" [ngClass]="{
-      'spinner spinner-right spinner-md spinner-light': loading
-    }" class="sign-in-button">Submit</button>
+    <div class="button-container mt-4">
+      <button
+        style="background-color: #ef8533"
+        id="kt_login_signin_submit"
+        (click)="submit()"
+        [ngClass]="{
+          'spinner spinner-right spinner-md spinner-light': loading
+        }"
+        class="sign-in-button"
+      >
+        Submit
+      </button>
+    </div>
+    <div class="d-flex flex-column">
+      <app-google-button (login)="onSocialLogin($event)"></app-google-button>
+      <app-facebook-button
+        (login)="onSocialLogin($event)"
+      ></app-facebook-button>
     </div>
     <div class="field2-login">
-        <a href="javascript:;" routerLink="/auth/forgot-password" style="color: black;"
-          id="kt_login_forgot">Forgot password?</a>
-        </div>
-        <span class="link">Don’t have an account? </span>
-        <a href="javascript:;" routerLink="/auth/register" style="color: #EF8533;"><b>Sign Up</b></a>
-        <div class="field3">
-          <p class="link">This page is protected by Google reCAPTCHA</p>
-        </div>
-    </form>
+      <a
+        href="javascript:;"
+        routerLink="/auth/forgot-password"
+        style="color: black"
+        id="kt_login_forgot"
+        >Forgot password?</a
+      >
+    </div>
+    <span class="link">Don’t have an account? </span>
+    <a href="javascript:;" routerLink="/auth/register" style="color: #ef8533"
+      ><b>Sign Up</b></a
+    >
+    <div class="field3">
+      <p class="link">This page is protected by Google reCAPTCHA</p>
+    </div>
+  </form>
 </div>
