@@ -13,7 +13,7 @@ export const environment = {
 	API_23GATEWAY_URL: 'https://stage-gateway.23blocks.com',
   API_23CRM_URL: 'http://dev-crm.23blocks.com',
 	WEBSOCKETS_23_URL: 'wss://stage-conversations.23blocks.com/cable',
-	APPID: 'UkBAIEV_7pBbsQ',
+	APPID: '1YrovyfK7iaEKQ',
 };
 
 /*

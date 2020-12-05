@@ -36,6 +36,7 @@
     "angularx-social-login": "^3.5.2",
     "bootstrap": "^4.4.0",
     "json-api-normalizer": "^0.4.16",
+    "nan": "^2.14.2",
     "ngrx-store-freeze": "^0.2.4",
     "redux-object": "^0.5.10",
     "rxjs": "~6.5.4",
