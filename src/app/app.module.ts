@@ -55,12 +55,12 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
         providers: [
           {
             id: FacebookLoginProvider.PROVIDER_ID,
-            provider: new FacebookLoginProvider('816866012448958'),
+            provider: new FacebookLoginProvider('406316833825841'),
           },
           {
             id: GoogleLoginProvider.PROVIDER_ID,
             provider: new GoogleLoginProvider(
-              '917615737635-7iqjdclcehug9gfv4v62jrfv8tb97vno.apps.googleusercontent.com'
+              '798862016735-bt864asvskvv4sa4dsronsogss3udhq4.apps.googleusercontent.com'
             ),
           },
         ],
